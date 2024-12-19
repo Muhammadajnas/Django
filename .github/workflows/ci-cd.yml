@@ -1,0 +1,36 @@
+name: CI/CD for Django App
+
+on:
+  push:
+    branches:
+      - master  
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: Build and Push Docker Image
+      run: |
+        docker build -t aj1naz/django:latest .
+        docker push aj1naz/django:latest
+
+    - name: Set up SSH
+      run: |
+        echo "${{ secrets.EC2_PEM_KEY }}" > ec2-key.pem
+        chmod 600 ec2-key.pem
+
+    - name: Deploy on EC2
+      run: |
+        ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@44.203.87.46 << 'EOF'
+        docker pull aj1naz/django:latest
+        docker stop django-app || true
+        docker rm django-app || true
+        docker run -d --name django-app -p 80:8000 aj1naz/django:latest
+        EOF

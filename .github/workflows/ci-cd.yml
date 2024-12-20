@@ -55,3 +55,6 @@ jobs:
           docker rm django-app-container || true
           docker run -d -p 80:8000 --name django-app-container django-app
         EOF
+
+
+

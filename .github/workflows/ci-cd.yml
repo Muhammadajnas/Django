@@ -21,17 +21,27 @@ jobs:
         docker build -t aj1naz/django:latest .
         docker push aj1naz/django:latest
 
-    - name: Set up SSH
+    - name: Set up SSH Key
       run: |
-        echo "${{ secrets.EC2_PEM_KEY }}" > ec2-key.pem
-        chmod 600 ec2-key.pem
+        echo "${{ secrets.EC2_PEM_KEY }}" | base64 -d > ec2-key.pem
+        chmod 400 ec2-key.pem
+        ls -la ec2-key.pem  # Debugging: Verify key exists and permissions are correct
+
+    - name: Test SSH Connection
+      run: |
+        ssh -vvv -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@44.203.87.46 echo "SSH connection successful"
 
     - name: Deploy on EC2
       run: |
         ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@44.203.87.46 << 'EOF'
+        set -e  # Stop on any errors
         docker pull aj1naz/django:latest
         docker stop django-app || true
         docker rm django-app || true
         docker run -d --name django-app -p 80:8000 aj1naz/django:latest
+        echo "Deployment completed successfully."
         EOF
-        
+
+    - name: Cleanup SSH Key
+      run: |
+        rm -f ec2-key.pem

@@ -34,3 +34,4 @@ jobs:
         docker rm django-app || true
         docker run -d --name django-app -p 80:8000 aj1naz/django:latest
         EOF
+        

@@ -30,10 +30,11 @@ jobs:
           chmod 400 ~/.ssh/sample.pem
           ssh-keyscan -H ${{ secrets.EC2_PUBLIC_IP }} >> ~/.ssh/known_hosts
 
-      # Step 5: Debug SSH Key (Optional, for debugging)
+      # Step 5: Debug SSH Key
       - name: Debug SSH Key
         run: |
           ls -la ~/.ssh/
+          cat ~/.ssh/sample.pem
           ssh -i ~/.ssh/sample.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} -o StrictHostKeyChecking=no echo "SSH connection successful"
 
       # Step 6: Deploy on EC2

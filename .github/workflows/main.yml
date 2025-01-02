@@ -22,7 +22,7 @@ jobs:
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/docker1.pem
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/sample.pem
           chmod 400 ~/.ssh/docker1.pem
           ssh-keyscan -H ${{ secrets.EC2_PUBLIC_IP }} >> ~/.ssh/known_hosts
       # Step 5: Debug SSH Key (Optional, for debugging)
@@ -33,7 +33,7 @@ jobs:
       # Step 6: Deploy on EC2
       - name: Deploy on EC2
         run: |
-          ssh -i ~/.ssh/docker1.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} << EOF
+          ssh -i ~/.ssh/sample.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} << EOF
           docker pull aj1naz/django:latest
           docker stop django-app || true
           docker rm django-app || true

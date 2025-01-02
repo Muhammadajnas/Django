@@ -1,47 +1,41 @@
-name: CI/CD for Django App
-
+name: CI/CD for Flask App
 on:
   push:
     branches:
-      - master  
-
+      - master
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v2
-
-    - name: Log in to Docker Hub
-      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-
-    - name: Build and Push Docker Image
-      run: |
-        docker build -t aj1naz/django:latest .
-        docker push aj1naz/django:latest
-
-    - name: Set up SSH Key
-      run: |
-        echo "${{ secrets.EC2_PEM_KEY }}" | base64 -d > ec2-key.pem
-        chmod 400 ec2-key.pem
-        ls -la ec2-key.pem  # Debugging: Verify key exists and permissions are correct
-
-    - name: Test SSH Connection
-      run: |
-        ssh -vvv -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@44.203.87.46 echo "SSH connection successful"
-
-    - name: Deploy on EC2
-      run: |
-        ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@44.203.87.46 << 'EOF'
-        set -e  # Stop on any errors
-        docker pull aj1naz/django:latest
-        docker stop django-app || true
-        docker rm django-app || true
-        docker run -d --name django-app -p 80:8000 aj1naz/django:latest
-        echo "Deployment completed successfully."
-        EOF
-
-    - name: Cleanup SSH Key
-      run: |
-        rm -f ec2-key.pem
+      # Step 1: Checkout Code
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      # Step 2: Log in to Docker Hub
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+      # Step 3: Build and Push Docker Image
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t aj1naz/django:latest .
+          docker push aj1naz/django:latest
+      # Step 4: Set up SSH for EC2
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/docker1.pem
+          chmod 400 ~/.ssh/docker1.pem
+          ssh-keyscan -H ${{ secrets.EC2_PUBLIC_IP }} >> ~/.ssh/known_hosts
+      # Step 5: Debug SSH Key (Optional, for debugging)
+      - name: Debug SSH Key
+        run: |
+          ls -la ~/.ssh/
+          ssh -i ~/.ssh/sample.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} -o StrictHostKeyChecking=no echo "SSH connection successful"
+      # Step 6: Deploy on EC2
+      - name: Deploy on EC2
+        run: |
+          ssh -i ~/.ssh/docker1.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} << EOF
+          docker pull aj1naz/django:latest
+          docker stop django-app || true
+          docker rm django-app || true
+          docker run -d --name django-app -p 8000:8000 aj1naz/django:latest
+          EOF

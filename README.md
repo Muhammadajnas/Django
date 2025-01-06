@@ -32,7 +32,7 @@ Follow the steps below to set up and run the project locally:
 git clone https://github.com/Muhammadajnas/Django.git
 cd Django 
 
-### Structure
+STRUCTURE
 
  Django/
 ├── <project_name>/        # Main project directory

@@ -28,7 +28,7 @@ Follow the steps below to set up and run the project locally:
 
 ### Clone the Repository
 
-
+```
 git clone https://github.com/Muhammadajnas/Django.git
 cd Django 
 

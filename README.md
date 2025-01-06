@@ -22,4 +22,31 @@ This project demonstrates the deployment of a Python (Django) web application. T
 4. AWS credentials configured locally.
 5. SSH key pair available (`~/.ssh/id_rsa.pub`).
 
+# Installation and Setup
 
+Follow the steps below to set up and run the project locally:
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/Muhammadajnas/Django.git
+cd Django
+
+### Structure
+
+ Django/
+├── <project_name>/        # Main project directory
+│   ├── settings.py        # Project settings
+│   ├── urls.py            # URL routing
+│   ├── wsgi.py            # WSGI configuration
+│   └── asgi.py            # ASGI configuration
+├── <app_name>/            # Custom app directory
+│   ├── migrations/        # Database migrations
+│   ├── admin.py           # Admin site customization
+│   ├── models.py          # Database models
+│   ├── views.py           # Application views
+│   └── urls.py            # App-specific URL routing
+├── db.sqlite3             # SQLite database (auto-created)
+├── manage.py              # Django's CLI utility
+├── requirements.txt       # Python dependencies
+└── README.md              # Project documentation

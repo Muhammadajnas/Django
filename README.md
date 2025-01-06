@@ -28,9 +28,9 @@ Follow the steps below to set up and run the project locally:
 
 ### Clone the Repository
 
-```bash
+
 git clone https://github.com/Muhammadajnas/Django.git
-cd Django
+cd Django 
 
 ### Structure
 
